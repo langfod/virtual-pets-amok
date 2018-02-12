@@ -292,13 +292,13 @@ public class VirtualPetShelterAmokApp {
 		return new VirtualPetShelter("Arthurs Wholistic Pet Shelter and Sasauge Factory") {
 			{
 				intake(new RoboticCat("Mew2k", "Feisty Can Opener"));
-				intake(new RoboticCat("Muffinator", "Silver backed attack cat"));
+				intake(new RoboticCat("Muffinat", "Silver attack cat"));
 				intake(new RoboticDog("CJackPO", "Car chewerupper"));
-				intake(new RoboticDog("Capn Jack0101", "Sheep Herder 24/7"));
+				intake(new RoboticDog("Capn 0101", "Sheep Herder 24/7"));
 				intake(new OrganicDog("Spot", "One eyed mutt"));
 				intake(new OrganicDog("Glumpy", "Furball"));
-				intake(new OrganicCat("Muffy", "100 pounds of furry terror"));
-				intake(new OrganicCat("Mr. Biggltons", "Siamese riffraff"));
+				intake(new OrganicCat("Muffy", "100 pounds of terror"));
+				intake(new OrganicCat("Biggltons", "Siamese riffraff"));
 			}
 		};
 	}

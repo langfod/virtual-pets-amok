@@ -41,10 +41,10 @@ public class OrganicDogTest {
 	@Test
 	public void constructorNameAndDescriptionAndFullAttributes() {
 		petUnderTest = new OrganicDog("Pet Name", "Pet Desciption", 50, 99, 51, 52, 20, 53);
-		assertThat(petUnderTest.getHunger(), is(51));
-		assertThat(petUnderTest.getThirst(), is(52));
-		assertThat(petUnderTest.getPoopiness(), is(20));
-		assertThat(petUnderTest.getHappiness(), is(53));
+		assertThat(petUnderTest.getHunger(), is(52));
+		assertThat(petUnderTest.getThirst(), is(20));
+		assertThat(petUnderTest.getPoopiness(), is(53));
+		assertThat(petUnderTest.getHappiness(), is(51));
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class OrganicDogTest {
 
 		int soilAmount = petUnderTest.soil();
 		assertThat(petUnderTest.getBoredom(), is(100));
-		assertThat(petUnderTest.getPoopiness(), is(60));
+		assertThat(petUnderTest.getPoopiness(), is(13));
 		assertThat(BagOfMostlyWater.POOP_DELTA, is(12));
 		assertThat(soilAmount, is(40));
 	}

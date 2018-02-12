@@ -26,9 +26,9 @@ public class OrganicDog extends BagOfMostlyWater implements Walkable {
 		super(name, description);
 	}
 
-	public OrganicDog(String name, String description, int health, int boredom, int hunger, int thirst, int poopiness,
-			int happiness) {
-		super(name, description, health, boredom, hunger, thirst, poopiness, happiness);
+	public OrganicDog(String name, String description, int health, int boredom, int happiness, int hunger, int thirst,
+			int poopiness) {
+		super(name, description, health, boredom, happiness, hunger, thirst, poopiness);
 	}
 
 	@Override
