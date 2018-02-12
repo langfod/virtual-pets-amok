@@ -1,3 +1,17 @@
+/*
+ * VirtualPet:
+ * 
+ * Abstract class to hold attributes and actions for a virtual pet. 
+ *
+ * 
+ * Author: David Langford
+ * Date  : Feb 09, 2018
+ * 
+ * 
+ * Depends on:
+ * 
+ * 
+ */
 package virtualpetsamok;
 
 public abstract class VirtualPet {
@@ -67,9 +81,9 @@ public abstract class VirtualPet {
 	}
 
 	public int tick() {
-		setBoredom(getBoredom() + 2);
-		setHappiness(getHappiness() - 1);
-		setHealth(getHealth() - 1);
+		setBoredom(Math.min(100,getBoredom() + 2));
+		setHappiness(Math.max(0,getHappiness() - ((getHealth() < 45) ? 5 : 1)));
+		setHealth(Math.max(0,getHealth() - 1));
 		return 0;
 	}
 

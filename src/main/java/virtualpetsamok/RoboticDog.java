@@ -1,3 +1,19 @@
+/*
+ * RoboticDog:
+ * 
+ * Subclass of BagOfMostlyWater class to hold attributes and actions for robotic virtual pet dogs. 
+ * implements the Walkable interface
+ * 
+ * Author: David Langford
+ * Date  : Feb 09, 2018
+ * 
+ * 
+ * Depends on:
+ * VirtualPet
+ * MechanizedEntity
+ * Walkable
+ * 
+ */
 package virtualpetsamok;
 
 public class RoboticDog extends MechanizedEntity implements Walkable {

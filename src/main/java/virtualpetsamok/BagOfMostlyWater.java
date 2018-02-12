@@ -1,3 +1,17 @@
+/*
+ * BagOfMostlyWater:
+ * 
+ * Abstract subclass of VirtualPet class to hold attributes and actions for organic virtual pets. 
+ *
+ * 
+ * Author: David Langford
+ * Date  : Feb 09, 2018
+ * 
+ * 
+ * Depends on:
+ * VirtualPet
+ * 
+ */
 package virtualpetsamok;
 
 public abstract class BagOfMostlyWater extends VirtualPet {
@@ -5,7 +19,7 @@ public abstract class BagOfMostlyWater extends VirtualPet {
 	protected static final int INITIAL_POOPINESS = 25;
 	protected static final int INITIAL_THIRST = 51;
 	protected static final int INITIAL_HUNGER = 42;
-	protected static final int FEED_DELTA = 10;
+	protected static final int FEED_DELTA = 13;
 	protected static final int WATER_DELTA = 11;
 	protected static final int POOP_DELTA = 12;
 
@@ -53,10 +67,12 @@ public abstract class BagOfMostlyWater extends VirtualPet {
 
 	public void feed() {
 		setHunger(Math.max(0, getHunger() - FEED_DELTA));
+		setHealth(Math.min(100, getHealth() + FEED_DELTA));
 	}
 
 	public void water() {
 		setThirst(Math.max(0, getThirst() - WATER_DELTA));
+		setHealth(Math.min(100, getHealth() + WATER_DELTA/2));
 	}
 
 	public abstract int soil();

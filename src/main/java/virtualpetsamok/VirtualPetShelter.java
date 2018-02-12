@@ -1,3 +1,25 @@
+/*
+ * VirtualPetShelter:
+ * 
+ * Object to hold VirtualPet objects and perform actions on them.
+ *
+ * 
+ * Author: David Langford
+ * Date  : Feb 09, 2018
+ * 
+ * 
+ * Depends on:
+ * 
+ * VirtualPet
+ * BagsOfMostlyWater
+ * MechanizedEntity
+ * PetHolder
+ * Cage
+ * LitterBox
+ * LitterBoxUser
+ * 
+ * 
+ */
 package virtualpetsamok;
 
 import java.util.AbstractMap;
@@ -110,12 +132,25 @@ public class VirtualPetShelter {
 		return tookPet;
 	}
 
-	public void OilAllRobots() {
+	public void oilAllRobots() {
 		getAllPets().stream().filter(MechanizedEntity.class::isInstance).forEach(p -> ((MechanizedEntity) p).oil());
 	}
 
 	public void playWithPetByName(String petName) {
 		getPetByName(petName).playWith();
+	}
+
+	public Collection<VirtualPet> removeDeadishPets() {
+		Collection<VirtualPet> deadPets = new ArrayList<>();
+		for (PetHolder holder : placesToStuffPets) {
+			for (VirtualPet pet : holder.getOccupants()) {
+				if (pet.getHealth() <= 1) {
+					holder.remove(pet);
+					deadPets.add(pet);
+				}
+			}
+		}
+		return deadPets;
 	}
 
 	private void setDescription(String description) {

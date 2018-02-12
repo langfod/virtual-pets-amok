@@ -1,3 +1,17 @@
+/*
+ * PetHolder:
+ * 
+ * Abstract class to hold attributes and actions for an object that will hold virtual pets. 
+ * 
+ * Author: David Langford
+ * Date  : Feb 09, 2018
+ * 
+ * 
+ * Depends on:
+ * VirtualPet
+ *
+ * 
+ */
 package virtualpetsamok;
 
 import java.util.Collection;

@@ -1,3 +1,19 @@
+/*
+ * OrganicDog:
+ * 
+ * Subclass of BagOfMostlyWater class to hold attributes and actions for organic virtual pet dogs. 
+ * implmests the Walkable interface
+ * 
+ * Author: David Langford
+ * Date  : Feb 09, 2018
+ * 
+ * 
+ * Depends on:
+ * VirtualPet
+ * BagOfMostlyWater
+ * Walkable
+ * 
+ */
 package virtualpetsamok;
 
 public class OrganicDog extends BagOfMostlyWater implements Walkable {

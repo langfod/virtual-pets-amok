@@ -1,10 +1,10 @@
 /*
- * VirtualPetShelter:
- * user interface to the VirtualPetShelter.
- * Have some fun with the shelter pet
+ * VirtualPetShelterApp:
+ * user interface to the VirtualPetShelter that went amok.
+ * Have some fun with the shelter cages, litterbox and pets - organic and robotic.
  * 
  * Author: David Langford
- * Date  : Feb 02, 2018
+ * Date  : Feb 09, 2018
  * 
  * 
  * Depends on:
@@ -12,12 +12,18 @@
  * VirtualPetShelter
  * VirtualPet
  * Menu
- * 
+ * BagOfMostlyWater
+ * MechanizedEntity
+ * RoboticDog
+ * RoboticCat
+ * OrganicCat
+ * OrganicDog
  * 
  */
 
 package virtualpetsamok;
 
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,25 +45,11 @@ public class VirtualPetShelterAmokApp {
 			System.out.println(mainMenu.genMenuString(2));
 			mainMenu.getOrdinalMenuChoice(input).run();
 			ArthursPetShelter.tick();
-			// doCheckForStiffies();
+			System.out.println(buildStiffieReport(ArthursPetShelter));
 		}
 
 	}
 
-	/*
-	 * private static void doCheckForStiffies() { boolean stiffiesFound = false;
-	 * Collection<VirtualPet> petShelterList = ArthursPetShelter.getAllPets();
-	 * VirtualPet[] petsInShelter = new VirtualPet[petShelterList.size()];
-	 * petsInShelter = petShelterList.toArray(petsInShelter);
-	 * 
-	 * for (VirtualPet pet : petsInShelter) { if (pet.getBoredom() > 100 ||
-	 * pet.getHunger() > 100 || pet.getThirst() > 100) { System.out.println("Oops. "
-	 * + pet.getName() + " has passed on."); ArthursPetShelter.adopt(pet.getName());
-	 * stiffiesFound = true; } } if (stiffiesFound) { System.out.
-	 * println("Their mortal remains have been sent to the incenerator.\n"); } else
-	 * { System.out.println("\nFeel the sun shining and the birds a chirpin!\n"); }
-	 * }
-	 */
 	private static Menu buildMainMenu() {
 		Menu fpMenu = new Menu("Main Menu") {
 			{
@@ -76,14 +68,6 @@ public class VirtualPetShelterAmokApp {
 		return fpMenu;
 	}
 
-	private static void doCleanAllCages(VirtualPetShelter vps) {
-		vps.cleanAllCages();
-	}
-
-	private static void doEmptyLitterBox(VirtualPetShelter vps) {
-		vps.emptyLitterBox();
-	}
-
 	private static Menu buildPetChoiceMenu() {
 		Menu pcMenu = new Menu("Choose Pet", "splitkeyname");
 		ArthursPetShelter.getAllPets()
@@ -91,12 +75,54 @@ public class VirtualPetShelterAmokApp {
 		return pcMenu;
 	}
 
-	private static void doFeedPets(VirtualPetShelter vps) {
-		System.out.println("\nYou toss in scoops of chow, and run!\n");
-		vps.feedAllPets();
+	private static String buildStiffieReport(VirtualPetShelter vps) {
+		Collection<VirtualPet> deadPetList = vps.removeDeadishPets();
+		StringBuilder sb = new StringBuilder();
+
+		if (!deadPetList.isEmpty()) {
+			deadPetList.forEach(
+					p -> sb.append("Oops. " + p.getName() + " the " + p.getDescription() + " has passed on.\n"));
+			sb.append("\nTheir mortal remains have been sent to the incenerator.\n");
+		} else {
+			sb.append("\nFeel the sun shining and the birds a chirpin!\n");
+		}
+		return sb.toString();
 	}
 
-	@SuppressWarnings("serial")
+	public static String createBanner(VirtualPetShelter vps) {
+		return "Welcome to " + vps + "!\n";
+	}
+
+	public static String createPetStatusReportString(VirtualPetShelter vps) {
+		StringBuffer output = new StringBuffer();
+		Formatter formatter = new Formatter(output);
+
+		formatter.format("%31s%n", "Pet Status Report");
+		formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", "Name", "Health", "Boredom", "Happy",
+				"Hunger", "Thirst", "Poop", "Oil", "Clean");
+		formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", "---------", "------", "-------",
+				"-----", "------", "------", "----", "----", "----");
+		vps.getAllPets().forEach(vp -> {
+			PetHolder petHolder = vps.findPetHolderByPetName(vp.getName()).get().getKey(); // should have made a get
+																							// PetHolder....
+			if (vp instanceof BagOfMostlyWater) {
+				BagOfMostlyWater pet = (BagOfMostlyWater) vp;
+				formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", pet.getName(),
+						pet.getHealth(), pet.getBoredom(), pet.getHappiness(), pet.getHunger(), pet.getThirst(),
+						pet.getPoopiness(), "N/A", petHolder.getCleanliness());
+			} else if (vp instanceof MechanizedEntity) {
+				MechanizedEntity pet = (MechanizedEntity) vp;
+
+				formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", pet.getName(),
+						pet.getHealth(), pet.getBoredom(), pet.getHappiness(), "N/A", "N/A", "N/A", pet.getOilLevel(),
+						petHolder.getCleanliness());
+			}
+		});
+
+		formatter.close();
+		return output.toString();
+	}
+
 	private static void doAdmissions(VirtualPetShelter vps) {
 		System.out.println("\nAdmissions->");
 		System.out.println("To admit a pet that has lost it's way, please fill out this form:\n");
@@ -183,6 +209,59 @@ public class VirtualPetShelterAmokApp {
 		}
 	}
 
+	private static void doAdoptaPet(VirtualPetShelter vps) {
+		String petName = getPetNameByUserChoice();
+		System.out.println("\nOops. We accidentally incenerated " + petName + "!\n");
+		vps.adopt(petName);
+	}
+
+	private static void doCleanAllCages(VirtualPetShelter vps) {
+		vps.cleanAllCages();
+	}
+
+	private static void doEmptyLitterBox(VirtualPetShelter vps) {
+		vps.emptyLitterBox();
+	}
+
+	private static void doFeedPets(VirtualPetShelter vps) {
+		System.out.println("\nYou toss in scoops of chow, and run!\n");
+		vps.feedAllPets();
+	}
+
+	private static void doOilPets(VirtualPetShelter vps) {
+		System.out.println("\nEat your heart out VO5. This oil treatment is crunchy pets only.\n");
+		vps.oilAllRobots();
+	}
+
+	private static void doPlayWithaPet(VirtualPetShelter vps) {
+		String petName = getPetNameByUserChoice();
+		System.out.println("\nYou have a ball playing with " + petName + "!\n");
+		vps.getPetByName(petName).playWith();
+	}
+
+	private static void doWaterPets(VirtualPetShelter vps) {
+		System.out.println("\nYou turn the hose on full and really soak those poor carbon based lifeforms.\n");
+		vps.waterAllPets();
+	}
+
+	private static String getPetNameByUserChoice() {
+		String petName = "";
+		while (petName.isEmpty()) {
+			Menu pcMenu = buildPetChoiceMenu();
+			System.out.println(pcMenu.genMenuString(2, "Which Pet would you like?"));
+			petName = pcMenu.getSplitKeyMenuChoice(input);
+		}
+
+		return petName;
+	}
+
+	private static void goodBye() {
+		// TODO println must die! (somehow?)
+		System.out.println("\nGoodBye!\n");
+		input.close();
+		System.exit(0);
+	}
+
 	private static VirtualPet virtualPetFactory(String majorPetType, String minorPetType, String name,
 			String description, Map<String, Integer> attributeMap) {
 		VirtualPet factoryBuiltPet = null;
@@ -209,90 +288,19 @@ public class VirtualPetShelterAmokApp {
 		return factoryBuiltPet;
 	}
 
-	private static void doAdoptaPet(VirtualPetShelter vps) {
-		String petName = getPetNameByUserChoice();
-		System.out.println("\nOops. We accidentally incenerated " + petName + "!\n");
-		vps.adopt(petName);
-	}
-
-	private static String getPetNameByUserChoice() {
-		String petName = "";
-		while (petName.isEmpty()) {
-			Menu pcMenu = buildPetChoiceMenu();
-			System.out.println(pcMenu.genMenuString(2, "Which Pet would you like?"));
-			petName = pcMenu.getSplitKeyMenuChoice(input);
-		}
-
-		return petName;
-	}
-
-	private static void doPlayWithaPet(VirtualPetShelter vps) {
-		String petName = getPetNameByUserChoice();
-		System.out.println("\nYou have a ball playing with " + petName + "!\n");
-		vps.getPetByName(petName).playWith();
-	}
-
-	private static void doWaterPets(VirtualPetShelter vps) {
-		System.out.println("\nYou turn the hose on full and really soak those poor carbon based lifeforms.\n");
-		vps.waterAllPets();
-	}
-
-	private static void doOilPets(VirtualPetShelter vps) {
-		System.out.println("\nEat your heart out VO5. This oil treatment is crunchy pets only.\n");
-		vps.OilAllRobots();
-	}
-
-	public static String createPetStatusReportString(VirtualPetShelter vps) {
-		StringBuffer output = new StringBuffer();
-		Formatter formatter = new Formatter(output);
-
-		formatter.format("%31s%n", "Pet Status Report");
-		formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", "Name", "Health", "Boredom", "Happy",
-				"Hunger", "Thirst", "Poop", "Oil", "Clean");
-		formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", "---------", "------", "-------",
-				"-----", "------", "------", "----", "----", "----");
-		vps.getAllPets().forEach(vp -> {
-			PetHolder petHolder = vps.findPetHolderByPetName(vp.getName()).get().getKey(); // should have made a get
-																							// PetHolder....
-			if (vp instanceof BagOfMostlyWater) {
-				BagOfMostlyWater pet = (BagOfMostlyWater) vp;
-				formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", pet.getName(),
-						pet.getHealth(), pet.getBoredom(), pet.getHappiness(), pet.getHunger(), pet.getThirst(),
-						pet.getPoopiness(), "N/A", petHolder.getCleanliness());
-			} else if (vp instanceof MechanizedEntity) {
-				MechanizedEntity pet = (MechanizedEntity) vp;
-
-				formatter.format("%9s | %6s | %7s | %5s | %6s | %6s | %4s | %4s | %4s%n", pet.getName(),
-						pet.getHealth(), pet.getBoredom(), pet.getHappiness(), "N/A", "N/A", "N/A", pet.getOilLevel(),
-						petHolder.getCleanliness());
-			}
-		});
-
-		formatter.close();
-		return output.toString();
-	}
-
-	public static String createBanner(VirtualPetShelter vps) {
-		return "Welcome to " + vps + "!\n";
-	}
-
 	private static VirtualPetShelter VirtualPetShelterFactory() {
 		return new VirtualPetShelter("Arthurs Wholistic Pet Shelter and Sasauge Factory") {
 			{
+				intake(new RoboticCat("Mew2k", "Feisty Can Opener"));
+				intake(new RoboticCat("Muffinator", "Silver backed attack cat"));
+				intake(new RoboticDog("CJackPO", "Car chewerupper"));
+				intake(new RoboticDog("Capn Jack0101", "Sheep Herder 24/7"));
 				intake(new OrganicDog("Spot", "One eyed mutt"));
-				intake(new OrganicCat("Muffy", "100 pound Terrier"));
-				intake(new RoboticCat("Rex", "Feisty Gecko"));
-				intake(new RoboticDog("Capn Jack", "Bald Parrot"));
-				// addPet(new VirtualPet("Snappy", "Introverted Turtle"));
+				intake(new OrganicDog("Glumpy", "Furball"));
+				intake(new OrganicCat("Muffy", "100 pounds of furry terror"));
+				intake(new OrganicCat("Mr. Biggltons", "Siamese riffraff"));
 			}
 		};
-	}
-
-	private static void goodBye() {
-		// TODO println must die! (somehow?)
-		System.out.println("\nGoodBye!\n");
-		input.close();
-		System.exit(0);
 	}
 
 }
