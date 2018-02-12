@@ -8,9 +8,9 @@ import org.junit.Test;
 
 public class CageTest {
 	private Cage cageBoxUnderBox = new Cage();
-	private VirtualPet testPet1 = new VirtualPetDog("Fido", "a Mutt");
+	private VirtualPet testPet1 = new OrganicDog("Fido", "a Mutt");
 
-	private VirtualPet testPet2 = new VirtualPetDog("Spot", "a dirtball");
+	private VirtualPet testPet2 = new OrganicDog("Spot", "a dirtball");
 	@Test
 	public void testAddOneOkay()  {
 		cageBoxUnderBox.add(testPet1);

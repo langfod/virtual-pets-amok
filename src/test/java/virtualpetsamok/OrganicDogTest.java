@@ -8,16 +8,15 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class VirtualPetDogTest {
+public class OrganicDogTest {
 
-	private static final VirtualPetDog petUnderTest = new VirtualPetDog("Pet Name", "Pet Desciption", 50, 99, 51, 52,
-			20, 53);
+	private static OrganicDog petUnderTest = new OrganicDog("Pet Name", "Pet Desciption", 50, 99, 51, 52, 20, 53);
 
-	private VirtualPet petUnderTestShort = new VirtualPetDog("Pet Name", "Pet Description");
+	private VirtualPet petUnderTestShort = new OrganicDog("Pet Name", "Pet Description");
 
 	@Test
 	public void constructorNameAndDescription() {
-		assertNotNull(new VirtualPetDog("Pet Name", "Pet Desciption"));
+		assertNotNull(new OrganicDog("Pet Name", "Pet Desciption"));
 	}
 
 	@Test
@@ -33,7 +32,7 @@ public class VirtualPetDogTest {
 
 	// @Test
 	// public void constructorNameAndDescriptionAndBaseAttributes() {
-	// VirtualPet petUnderTest = new VirtualPetDog("Pet Name", "Pet Desciption", 50,
+	// VirtualPet petUnderTest = new OrganicDog("Pet Name", "Pet Desciption", 50,
 	// 99);
 	// assertThat(petUnderTest.getBoredom(), is(99));
 	// assertThat(petUnderTest.getHealth(), is(50));
@@ -41,6 +40,7 @@ public class VirtualPetDogTest {
 
 	@Test
 	public void constructorNameAndDescriptionAndFullAttributes() {
+		petUnderTest = new OrganicDog("Pet Name", "Pet Desciption", 50, 99, 51, 52, 20, 53);
 		assertThat(petUnderTest.getHunger(), is(51));
 		assertThat(petUnderTest.getThirst(), is(52));
 		assertThat(petUnderTest.getPoopiness(), is(20));
@@ -74,13 +74,29 @@ public class VirtualPetDogTest {
 		assertThat(happinessBefore, lessThan(petUnderTest.getHappiness()));
 
 	}
-/*
+	/*
+	 * @Test public void soilShouldChangePoopinessByDeltaValue() { int
+	 * poopinessBefore = petUnderTest.getPoopiness(); petUnderTest.soil(); int
+	 * poopinessChanged = poopinessBefore - petUnderTest.getPoopiness();
+	 * assertThat(poopinessChanged, is(BagOfMostlyWater.POOP_DELTA)); }
+	 */
+
 	@Test
-	public void soilShouldChangePoopinessByDeltaValue() {
-		int poopinessBefore = petUnderTest.getPoopiness();
-		petUnderTest.soil();
-		int poopinessChanged = poopinessBefore - petUnderTest.getPoopiness();
-		assertThat(poopinessChanged, is(BagOfMostlyWater.POOP_DELTA));
+	public void soilTestLowBoredom() {
+		petUnderTest = new OrganicDog("Pet Name", "Pet Desciption", 50, 10, 51, 52, 20, 53);
+
+		int soilAmount = petUnderTest.soil();
+		assertThat(soilAmount, is(12));
 	}
-	*/
+
+	@Test
+	public void soilTestHighBoredom() {
+		petUnderTest = new OrganicDog("Pet Name", "Pet Desciption", 50, 100, 51, 52, 100, 53);
+
+		int soilAmount = petUnderTest.soil();
+		assertThat(petUnderTest.getBoredom(), is(100));
+		assertThat(petUnderTest.getPoopiness(), is(60));
+		assertThat(BagOfMostlyWater.POOP_DELTA, is(12));
+		assertThat(soilAmount, is(40));
+	}
 }

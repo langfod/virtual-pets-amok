@@ -1,20 +1,22 @@
 package virtualpetsamok;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
-
 
 public class VirtualPetShelterTest {
 
 	private VirtualPetShelter vpsUnderTest = new VirtualPetShelter();
-	private VirtualPet testPet = new VirtualPetDog("Pet Name", "Pet Description");
+	private VirtualPet testPet = new OrganicDog("Pet Name", "Pet Description");
 
 	@Test
 	public void createEmptyShelter() {
@@ -52,12 +54,25 @@ public class VirtualPetShelterTest {
 	@Test
 	public void allowIntakeofDogIntoCageOnly() {
 		vpsUnderTest = new VirtualPetShelter("Test Shelter", 1, 1);
-		vpsUnderTest.intake(testPet);
+		assertTrue(vpsUnderTest.intake(testPet));
 		for (PetHolder holder : vpsUnderTest.placesToStuffPets) {
 			if (holder instanceof Cage) {
 				assertThat(holder.getOccupancy(), is(1));
 			} else if (holder instanceof LitterBox) {
 				assertThat(holder.getOccupancy(), is(0));
+			}
+		}
+	}
+
+	@Test
+	public void allowIntakeofCatIntoLitterBoxOnly() {
+		vpsUnderTest = new VirtualPetShelter("Test Shelter", 1, 1);
+		vpsUnderTest.intake(new OrganicCat("Test Cat", "meow"));
+		for (PetHolder holder : vpsUnderTest.placesToStuffPets) {
+			if (holder instanceof Cage) {
+				assertThat(holder.getOccupancy(), is(0));
+			} else if (holder instanceof LitterBox) {
+				assertThat(holder.getOccupancy(), is(1));
 			}
 		}
 	}
@@ -87,7 +102,7 @@ public class VirtualPetShelterTest {
 	@Test
 	public void cleanAllLitterBoxesShouldSetCleanlinessto100LitterBoxesOnly() {
 		vpsUnderTest.placesToStuffPets.forEach(h -> h.dirty(10));
-		vpsUnderTest.cleanAllLitterBox();
+		vpsUnderTest.emptyLitterBox();
 		for (PetHolder holder : vpsUnderTest.placesToStuffPets) {
 			if (holder instanceof Cage) {
 				assertThat(holder.getCleanliness(), is(90));
@@ -120,10 +135,10 @@ public class VirtualPetShelterTest {
 	/*
 	 * @Test public void shouldAllowIntakeOfMultiplePetsandRetrieveCollection() {
 	 * vpsUnderTest.intake(testPet); vpsUnderTest.intake(new
-	 * VirtualPetDog("Second Pet Name", "Second Description"));
-	 * vpsUnderTest.intake(new VirtualPetDog("Third Pet Name",
-	 * "Second Description")); Collection<VirtualPet> retrievedCollection =
-	 * vpsUnderTest.getAllPets(); assertThat(3, is(retrievedCollection.size())); }
+	 * OrganicDog("Second Pet Name", "Second Description")); vpsUnderTest.intake(new
+	 * OrganicDog("Third Pet Name", "Second Description")); Collection<VirtualPet>
+	 * retrievedCollection = vpsUnderTest.getAllPets(); assertThat(3,
+	 * is(retrievedCollection.size())); }
 	 */
 
 	@Test
@@ -142,7 +157,7 @@ public class VirtualPetShelterTest {
 	@Test
 	public void adoptShouldReduceNumberOfPets() {
 		vpsUnderTest.intake(testPet);
-		vpsUnderTest.intake(new VirtualPetDog("Pet Name2", "Pet Description"));
+		vpsUnderTest.intake(new OrganicDog("Pet Name2", "Pet Description"));
 		int beforeSize = vpsUnderTest.getAllPets().size();
 		vpsUnderTest.adopt("Pet Name").get();
 		int afterSize = vpsUnderTest.getAllPets().size();
@@ -152,27 +167,27 @@ public class VirtualPetShelterTest {
 	@Test
 	public void feedAllPetsInShelter() {
 		vpsUnderTest.intake(testPet);
-		testPet = new VirtualPetDog("Second Pet Name", "Second Description");
+		testPet = new OrganicDog("Second Pet Name", "Second Description");
 		vpsUnderTest.intake(testPet);
-		int beforeHunger = ((BagOfMostlyWater)testPet).getHunger();
-		vpsUnderTest.intake(new VirtualPetDog("Third Pet Name", "Second Description"));
+		int beforeHunger = ((BagOfMostlyWater) testPet).getHunger();
+		vpsUnderTest.intake(new OrganicDog("Third Pet Name", "Second Description"));
 		vpsUnderTest.feedAllPets();
-		BagOfMostlyWater retrievedPet = (BagOfMostlyWater)vpsUnderTest.getPetByName("Second Pet Name");
+		BagOfMostlyWater retrievedPet = (BagOfMostlyWater) vpsUnderTest.getPetByName("Second Pet Name");
 		assertThat(retrievedPet.getHunger(), lessThan(beforeHunger));
-		
+
 	}
-	
+
 	@Test
 	public void waterAllPetsInShelter() {
 		vpsUnderTest.intake(testPet);
-		testPet = new VirtualPetDog("Second Pet Name", "Second Description");
+		testPet = new OrganicDog("Second Pet Name", "Second Description");
 		vpsUnderTest.intake(testPet);
-		int beforeThirst = ((BagOfMostlyWater)testPet).getThirst();
-		vpsUnderTest.intake(new VirtualPetDog("Third Pet Name", "Second Description"));
+		int beforeThirst = ((BagOfMostlyWater) testPet).getThirst();
+		vpsUnderTest.intake(new OrganicDog("Third Pet Name", "Second Description"));
 		vpsUnderTest.waterAllPets();
-		BagOfMostlyWater retrievedPet = (BagOfMostlyWater)vpsUnderTest.getPetByName("Second Pet Name");
+		BagOfMostlyWater retrievedPet = (BagOfMostlyWater) vpsUnderTest.getPetByName("Second Pet Name");
 		assertThat(retrievedPet.getThirst(), lessThan(beforeThirst));
-		
+
 	}
 
 }

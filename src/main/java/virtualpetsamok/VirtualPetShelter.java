@@ -10,7 +10,6 @@ import java.util.Optional;
 public class VirtualPetShelter {
 
 	String description;
-	// TODO Map<String, VirtualPet> petList = new HashMap<>();
 	Collection<PetHolder> placesToStuffPets = new ArrayList<>();
 
 	public VirtualPetShelter() {
@@ -39,18 +38,23 @@ public class VirtualPetShelter {
 		});
 	}
 
-	// add pet to holder; If walkable then holder must be Cage
-	// if no room is found then return False
-	// if added then return True
-	public boolean intake(VirtualPet pet) {
+	public Optional<VirtualPet> adopt(String petName) {
+		Optional<SimpleEntry<PetHolder, VirtualPet>> optPetHolder = findPetHolderByPetName(petName);
+		Optional<VirtualPet> outFoundPet = Optional.empty();
+		if (optPetHolder.isPresent()) {
+			outFoundPet = Optional.ofNullable(optPetHolder.get().getValue());
+			optPetHolder.get().getKey().remove(outFoundPet.get());
+		}
+		return outFoundPet;
+	}
+
+	private boolean checkAndStuffPet(VirtualPet pet, Class<?> classTypeToFilter) {
 		boolean tookPet = false;
-		if (pet instanceof Walkable) {
-			Optional<PetHolder> cage = placesToStuffPets.stream().filter(Cage.class::isInstance)
-					.filter(c -> c.isSpaceAvailable()).findFirst();
-			if (cage.isPresent()) {
-				cage.get().add(pet);
-				tookPet = true;
-			}
+		Optional<PetHolder> petHolder = placesToStuffPets.stream().filter(classTypeToFilter::isInstance)
+				.filter(c -> c.isSpaceAvailable()).findFirst();
+		if (petHolder.isPresent()) {
+			petHolder.get().add(pet);
+			tookPet = true;
 		}
 		return tookPet;
 	}
@@ -59,15 +63,19 @@ public class VirtualPetShelter {
 		cleanPetHolder(Cage.class);
 	}
 
-	public void cleanAllLitterBox() {
-		cleanPetHolder(LitterBox.class);
-	}
-
 	private void cleanPetHolder(Class<? extends PetHolder> holder) {
 		placesToStuffPets.stream().filter(holder::isInstance).forEach(h -> h.clean());
 	}
 
-	private Optional<AbstractMap.SimpleEntry<PetHolder, VirtualPet>> findPetHolderByPetName(String petName) {
+	public void emptyLitterBox() {
+		cleanPetHolder(LitterBox.class);
+	}
+
+	public void feedAllPets() {
+		getAllPets().stream().filter(BagOfMostlyWater.class::isInstance).forEach(p -> ((BagOfMostlyWater) p).feed());
+	}
+
+	public Optional<AbstractMap.SimpleEntry<PetHolder, VirtualPet>> findPetHolderByPetName(String petName) {
 		Optional<AbstractMap.SimpleEntry<PetHolder, VirtualPet>> output = Optional.empty();
 
 		for (PetHolder holder : placesToStuffPets) {
@@ -82,50 +90,57 @@ public class VirtualPetShelter {
 		return output;
 	}
 
-	public VirtualPet getPetByName(String petName) {
-		return findPetHolderByPetName(petName).isPresent() ? findPetHolderByPetName(petName).get().getValue() : null;
-	}
-
 	public Collection<VirtualPet> getAllPets() {
 		Collection<VirtualPet> petList = new ArrayList<>();
 		placesToStuffPets.stream().forEach(h -> petList.addAll(h.getOccupants()));
 		return petList;
 	}
 
-	public Optional<VirtualPet> adopt(String petName) {
-		Optional<SimpleEntry<PetHolder, VirtualPet>> optPetHolder = findPetHolderByPetName(petName);
-		Optional<VirtualPet> outFoundPet = Optional.empty();
-		if (optPetHolder.isPresent()) {
-			outFoundPet = Optional.ofNullable(optPetHolder.get().getValue());
-			optPetHolder.get().getKey().remove(outFoundPet.get());
-		}
-		return outFoundPet;
+	public VirtualPet getPetByName(String petName) {
+		return findPetHolderByPetName(petName).isPresent() ? findPetHolderByPetName(petName).get().getValue() : null;
 	}
 
-	public void feedAllPets() {
-		getAllPets().stream().filter(BagOfMostlyWater.class::isInstance).forEach(p -> ((BagOfMostlyWater)p).feed());
+	public boolean intake(VirtualPet pet) {
+		boolean tookPet = false;
+		if (pet instanceof Walkable) {
+			tookPet = checkAndStuffPet(pet, Cage.class);
+		} else if (pet instanceof LitterBoxUser) {
+			tookPet = checkAndStuffPet(pet, LitterBox.class);
+		}
+		return tookPet;
 	}
-	
-	
-	 public void waterAllPets() {
-			getAllPets().stream().filter(BagOfMostlyWater.class::isInstance).forEach(p -> ((BagOfMostlyWater)p).water());
-	 }
-	
-//	 public void playWithAllPets() {
-//	 petList.values().forEach(VirtualPet::playWith);
-//	 }
-//	
-//	 public void tick() {
-//	 petList.values().forEach(VirtualPet::tick);
-//	 }
+
+	public void OilAllRobots() {
+		getAllPets().stream().filter(MechanizedEntity.class::isInstance).forEach(p -> ((MechanizedEntity) p).oil());
+	}
+
+	public void playWithPetByName(String petName) {
+		getPetByName(petName).playWith();
+	}
 
 	private void setDescription(String description) {
 		this.description = description;
 	}
 
+	public void tick() {
+		for (PetHolder holder : placesToStuffPets) {
+			for (VirtualPet pet : holder.getOccupants()) {
+				int nightSoilAmount = pet.tick();
+				if (pet instanceof BagOfMostlyWater) {
+					holder.dirty(nightSoilAmount);
+					pet.enviromentHealthUpdate(holder.getCleanliness());
+				}
+			}
+		}
+	}
+
 	@Override
 	public String toString() {
 		return description;
+	}
+
+	public void waterAllPets() {
+		getAllPets().stream().filter(BagOfMostlyWater.class::isInstance).forEach(p -> ((BagOfMostlyWater) p).water());
 	}
 
 }

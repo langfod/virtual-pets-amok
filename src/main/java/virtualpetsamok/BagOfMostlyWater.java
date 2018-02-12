@@ -14,12 +14,12 @@ public abstract class BagOfMostlyWater extends VirtualPet {
 	private int hunger;
 
 	public BagOfMostlyWater(String name, String description) {
-		this(name, description, INITIAL_HEALTH, INITIAL_BOREDOM, INITIAL_HUNGER, INITIAL_THIRST, INITIAL_POOPINESS, INITIAL_HAPPINESS);
+		this(name, description, INITIAL_HEALTH, INITIAL_BOREDOM, INITIAL_HAPPINESS, INITIAL_HUNGER, INITIAL_THIRST,
+				INITIAL_POOPINESS);
 	}
 
-	
-	public BagOfMostlyWater(String name, String description, int health, int boredom, int hunger, int thirst,
-			int poopiness, int happiness) {
+	public BagOfMostlyWater(String name, String description, int health, int boredom, int happiness, int hunger,
+			int thirst, int poopiness) {
 		super(name, description, health, boredom, happiness);
 		this.setHunger(hunger);
 		this.setThirst(thirst);
@@ -52,14 +52,21 @@ public abstract class BagOfMostlyWater extends VirtualPet {
 	}
 
 	public void feed() {
-		setHunger(getHunger() - FEED_DELTA);
+		setHunger(Math.max(0, getHunger() - FEED_DELTA));
 	}
 
 	public void water() {
-		setThirst(getThirst() - WATER_DELTA);
+		setThirst(Math.max(0, getThirst() - WATER_DELTA));
 	}
 
-	public void soil() {
-		setPoopiness(getThirst() - POOP_DELTA);
+	public abstract int soil();
+
+	public int tick() {
+		super.tick();
+		setHunger(getHunger() + 5);
+		setThirst(getThirst() + 3);
+		setPoopiness(getPoopiness() + 4);
+		return soil();
 	}
+
 }

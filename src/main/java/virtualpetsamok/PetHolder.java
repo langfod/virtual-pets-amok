@@ -16,9 +16,10 @@ public abstract class PetHolder implements Iterable<Entry<String, VirtualPet>> {
 		this.capacity = capacity;
 	}
 
-	@Override
-	public Iterator<Entry<String, VirtualPet>> iterator() {
-		return thingOfHolding.entrySet().iterator();
+	public void add(VirtualPet p) {
+		if (getOccupancy() >= capacity)
+			throw new IndexOutOfBoundsException();
+		thingOfHolding.put(p.getName(), p);
 	}
 
 	public void clean() {
@@ -37,26 +38,25 @@ public abstract class PetHolder implements Iterable<Entry<String, VirtualPet>> {
 		return cleanliness;
 	}
 
-	public boolean isSpaceAvailable() {
-		return (getOccupancy() < capacity);
-	}
-
-	public void add(VirtualPet p) {
-		if (getOccupancy() >= capacity)
-			throw new IndexOutOfBoundsException();
-		thingOfHolding.put(p.getName(), p);
-	}
-
-	public VirtualPet remove(VirtualPet p) {
-		return thingOfHolding.remove(p.getName());
-	}
-
 	public int getOccupancy() {
 		return thingOfHolding.size();
 	}
 
 	public Collection<VirtualPet> getOccupants() {
 		return thingOfHolding.values();
+	}
+
+	public boolean isSpaceAvailable() {
+		return (getOccupancy() < capacity);
+	}
+
+	@Override
+	public Iterator<Entry<String, VirtualPet>> iterator() {
+		return thingOfHolding.entrySet().iterator();
+	}
+
+	public VirtualPet remove(VirtualPet p) {
+		return thingOfHolding.remove(p.getName());
 	}
 
 }

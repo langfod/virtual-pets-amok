@@ -1,18 +1,19 @@
 package virtualpetsamok;
 
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 public class LitterBoxTest {
 
 	private LitterBox litterBoxUnderBox = new LitterBox();
-	private VirtualPet testPet1 = new VirtualPetDog("Fido", "a Mutt");
-	private VirtualPet testPet2 = new VirtualPetDog("Spot", "a dirtball");
+	private VirtualPet testPet1 = new OrganicCat("Fido", "a Mutt");
+	private VirtualPet testPet2 = new OrganicCat("Fluffy", "a dirtball");
 
 	@Test
 	public void testLitterBox() {
@@ -25,12 +26,19 @@ public class LitterBoxTest {
 		litterBoxUnderBox.add(testPet2);
 		assertThat(litterBoxUnderBox.getOccupancy(), is(2));
 	}
+	
+	@Test
+	public void spaceAvailShouldBeTrue() {
+		litterBoxUnderBox.add(testPet1);
+		litterBoxUnderBox.add(testPet2);
+		assertTrue(litterBoxUnderBox.isSpaceAvailable());
+	}
 
 	@Test
 	public void testAddAndgetOccupants() {
 		litterBoxUnderBox.add(testPet1);
 		litterBoxUnderBox.add(testPet2);
-		assertThat(litterBoxUnderBox.getOccupants(), contains(testPet1, testPet2));
+		assertThat(litterBoxUnderBox.getOccupants(), containsInAnyOrder(testPet1, testPet2));
 	}
 
 	@Test
@@ -58,9 +66,9 @@ public class LitterBoxTest {
 	@Test
 	public void testClean() {
 		int beforeClean = litterBoxUnderBox.getCleanliness();
-		litterBoxUnderBox.dirty();
+		litterBoxUnderBox.dirty(50);
 		litterBoxUnderBox.clean();
-		assertThat(litterBoxUnderBox.getCleanliness(), lessThan(beforeClean));
+		assertThat(litterBoxUnderBox.getCleanliness(), is(beforeClean));
 	}
 
 }
